@@ -58,7 +58,8 @@ describe 'nova::compute::libvirt' do
           :remove_unused_kernels                      => true,
           :remove_unused_resized_minimum_age_seconds  => 3600,
           :remove_unused_original_minimum_age_seconds => 3600,
-          :libvirt_service_name                       => 'custom_service'
+          :libvirt_service_name                       => 'custom_service',
+          :libvirt_package_name                       => 'libvirt-bin/trusty-proposed'
         }
       end
 
@@ -76,6 +77,10 @@ describe 'nova::compute::libvirt' do
         :ensure   => 'running',
         :require  => 'Package[libvirt]',
         :before   => 'Service[nova-compute]'
+      )}
+      it { should contain_package('libvirt').with(
+        :name   => 'libvirt-bin/trusty-proposed',
+        :ensure => 'present'
       )}
     end
 
