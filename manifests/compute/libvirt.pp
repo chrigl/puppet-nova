@@ -78,6 +78,10 @@
 #   (optional) libvirt service name.
 #   Defaults to $::nova::params::libvirt_service_name
 #
+# [*libvirt_package_name*]
+#   (optional) libvirt package name.
+#   Defaults to $::nova::params::libvirt_packages_name
+#
 class nova::compute::libvirt (
   $libvirt_virt_type                          = 'kvm',
   $vncserver_listen                           = '127.0.0.1',
@@ -92,6 +96,7 @@ class nova::compute::libvirt (
   $remove_unused_resized_minimum_age_seconds  = undef,
   $remove_unused_original_minimum_age_seconds = undef,
   $libvirt_service_name                       = $::nova::params::libvirt_service_name,
+  $libvirt_package_name                       = undef,
 ) inherits nova::params {
 
   include ::nova::params
@@ -110,6 +115,13 @@ class nova::compute::libvirt (
     }
   } else {
     $libvirt_cpu_mode_real = $libvirt_cpu_mode
+  }
+
+  # If one passes undef, using $::nova::params::libvirt_package_name
+  if $libvirt_package_name {
+    $libvirt_package_name_real = $libvirt_package_name
+  } else {
+    $libvirt_package_name_real = $::nova::params::libvirt_package_name
   }
 
   if($::osfamily == 'Debian') {
@@ -141,7 +153,7 @@ class nova::compute::libvirt (
 
   package { 'libvirt':
     ensure => present,
-    name   => $::nova::params::libvirt_package_name,
+    name   => $libvirt_package_name_real,
   }
 
   service { 'libvirt' :
